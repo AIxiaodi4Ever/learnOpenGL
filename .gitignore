@@ -1,0 +1,8 @@
+# build
+build/
+
+# resource
+resources/
+
+#Libs
+Libs/
