@@ -202,6 +202,7 @@ int main()
 
         // floor
         glStencilMask(0x00);
+        glStencilFunc(GL_ALWAYS, 1, 0xff);
         glBindVertexArray(planeVAO);
         glBindTexture(GL_TEXTURE_2D, floorTexture);
         shader.setMat4("model", glm::mat4(1.0f));
@@ -223,8 +224,8 @@ int main()
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
         // cubes border
-        glStencilFunc(GL_NOTEQUAL, 1, 0xff);
         glStencilMask(0x00);
+        glStencilFunc(GL_NOTEQUAL, 1, 0xff);
         glDisable(GL_DEPTH_TEST);
         shaderBorder.use();
         model = glm::mat4(1.0f);
@@ -233,7 +234,6 @@ int main()
         shaderBorder.setMat4("view", view);
         shaderBorder.setMat4("projection", projection);
         shaderBorder.setMat4("model", model);
-        // glBindVertexArray(cubeVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(2.0f, 0.01f, 0.0f));
@@ -243,7 +243,6 @@ int main()
 
         glBindVertexArray(0);
         glStencilMask(0xFF);
-        glStencilFunc(GL_ALWAYS, 0, 0xFF);
         glEnable(GL_DEPTH_TEST);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
