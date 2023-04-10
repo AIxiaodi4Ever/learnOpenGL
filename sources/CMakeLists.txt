@@ -1,12 +1,21 @@
+include_directories(${PROJECT_SOURCE_DIR}/includes)
+
 # common source
 add_subdirectory(Common)
 
 # GLFW
 find_library(GLFW NAMES glfw3 PATHS ${PROJECT_SOURCE_DIR}/Libs)
+
+# assimp
+find_library(ASSIMP NAMES assimp-vc142-mt PATHS ${PROJECT_SOURCE_DIR}/Libs)
+
 # OpenGL
 find_package(OpenGL REQUIRED OPTIONAL_COMPONENTS OpenGL)
 
+link_directories(${PROJECT_SOURCE_DIR}/Libs)
+
 message(STATUS "GLFW IS: ${GLFW}")
+message(STATUS "ASSIMP IS: ${ASSIMP}")
 message(STATUS "OPENGL_LIBRARY is: ${OPENGL_LIBRARY}")
 
 # each step
@@ -27,6 +36,16 @@ foreach(sample IN ITEMS
     2_3_Material
     2_4_LightCaster
     2_5_MultipleLight
+    3_1_AssimpLoadModel
+    4_1_DepthBuffer
+    4_2_StencilBuffer
+    4_3_Blend
+    4_4_FaceCulling
+    4_5_FrameBuffer
+    4_5_Framebuffer_PostProcess
+    4_6_Skybox
+    4_6_EnvironmentMap
+    4_6_EnvironmentMapRefract
     )
   add_subdirectory(${sample}) 
 endforeach()

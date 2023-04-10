@@ -4,5 +4,4 @@ build/
 # resource
 resources/
 
-#Libs
-Libs/
+.vscode/

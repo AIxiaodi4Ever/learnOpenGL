@@ -155,8 +155,6 @@ int main() {
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 	glEnableVertexAttribArray(3);
-	glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-	glEnableVertexAttribArray(4);
 
 	/* this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound
 	 vertex buffer object so afterwards we can safelt unbind */
@@ -177,10 +175,11 @@ int main() {
 
 	// load textures
 	// -------------
+	stbi_set_flip_vertically_on_load(true);
 	unsigned int diffuseMap = loadTexture("../resources/textures/container2.png");
-	//unsigned int specularMap = loadTexture("../resources/textures/container2_specular_colored.png");
+	unsigned int specularMap = loadTexture("../resources/textures/container2_specular_colored.png");
 	unsigned int emissionMap = loadTexture("../resources/textures/matrix.jpg");
-	unsigned int specularMap = loadTexture("../resources/textures/container2_specular.png");
+	// unsigned int specularMap = loadTexture("../resources/textures/container2_specular.png");
 
 	// sharder configuration
 	// ---------------------
@@ -308,6 +307,12 @@ void processInput(GLFWwindow* window) {
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
 		camera.ProcessKeyboard(Camera_Movement::RIGHT, deltaTime);
 	}
+	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
+		camera.ProcessKeyboard(Camera_Movement::UP, deltaTime);
+	}
+	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
+		camera.ProcessKeyboard(Camera_Movement::DOWN, deltaTime);
+	}
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
@@ -345,7 +350,6 @@ unsigned int loadTexture(const char* path)
 	glGenTextures(1, &textureID);
 
 	int width, height, nrComponents;
-	stbi_set_flip_vertically_on_load(true);
 	unsigned char* data = stbi_load(path, &width, &height, &nrComponents, 0);
 	if (data) {
 		GLenum format;

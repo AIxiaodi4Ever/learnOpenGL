@@ -3,7 +3,7 @@ add_executable(2_5_MultipleLight)
 file(GLOB SRC ./ *.cpp
   )
 
-message(STATUS ${SRC})
+# message(STATUS ${SRC})
 
 target_sources(2_5_MultipleLight
   PRIVATE

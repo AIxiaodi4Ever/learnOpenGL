@@ -181,14 +181,22 @@ int main() {
 		// set the objectColor and lightColor
 		ourShader.setVec3("viewPos", camera.Position);
 
+		glm::vec3 lightColor;
+		lightColor.x = sin(glfwGetTime() * 2.0f / 3.0f);
+		lightColor.y = sin(glfwGetTime() * 0.7f / 3.0f);
+		lightColor.z = sin(glfwGetTime() * 1.3f / 3.0f);
+			
+		glm::vec3 diffuseColor = lightColor   * glm::vec3(0.5f); 
+		glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f); 
+		
 		ourShader.setVec3("light.position", lightPos);
-		ourShader.setVec3("light.ambient", 1.0f, 1.0f, 1.0f);
-		ourShader.setVec3("light.diffuse", 1.0f, 1.0f, 1.0f);
+		ourShader.setVec3("light.ambient", ambientColor);
+		ourShader.setVec3("light.diffuse", diffuseColor);
 		ourShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
 
-		ourShader.setVec3("material.ambient", 0.0f, 0.1f, 0.06f);
-		ourShader.setVec3("material.diffuse", 0.0f, 0.50980392f, 0.50980392f);
-		ourShader.setVec3("material.specular", 0.50196078f, 0.50196078f, 0.50196078f);
+		ourShader.setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
+		ourShader.setVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
+		ourShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
 		ourShader.setFloat("material.shininess", 32.0f);
 
 		// set the model, view and projection matrix THREE ways
