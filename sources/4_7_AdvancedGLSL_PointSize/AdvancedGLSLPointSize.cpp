@@ -74,6 +74,7 @@ int main()
     // configure global opengl state
     // -----------------------------
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_PROGRAM_POINT_SIZE);
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
@@ -205,10 +206,9 @@ int main()
 
     // shader configuration
     // --------------------
-    Shader shader("../Shaders/4_6_refractionCubeMap.vs.glsl", "../Shaders/4_6_refractionCubeMap.fs.glsl");
+    Shader shader("../Shaders/4_7_pointSize.vs.glsl", "../Shaders/4_7_pointSize.fs.glsl");
     Shader skyboxShader("../Shaders/4_6_skybox.vs.glsl", "../Shaders/4_6_skybox.fs.glsl");
     shader.use();
-    shader.setInt("skybox ", 0);
     
     skyboxShader.use();
     skyboxShader.setInt("skybox", 0);
@@ -244,12 +244,13 @@ int main()
         shader.setMat4("model", model);
         shader.setMat4("view", view);
         shader.setMat4("projection", projection);
-        shader.setVec3("cameraPos", camera.Position);
         // cubes 
         glBindVertexArray(cubeVAO);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, cubeTexture); 	
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        // glActiveTexture(GL_TEXTURE0);
+        // glBindTexture(GL_TEXTURE_2D, cubeTexture); 	
+        // glDrawArrays(GL_TRIANGLES, 0, 36);
+        glDrawArrays(GL_POINTS, 0, 36);
+        // glDrawArrays(GL_LINES, 0, 36);
         glBindVertexArray(0);
 
         // draw skybox as last

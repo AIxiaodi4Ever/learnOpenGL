@@ -10,5 +10,6 @@ void main()
 {
     TexCoords = aPos;
     vec4 pos = projection * view * vec4(aPos, 1.0);
-    gl_Position = pos.xyww;
+    // in this way, sky box will always behind all object with the depth 1
+    gl_Position = pos.xyww; 
 }  

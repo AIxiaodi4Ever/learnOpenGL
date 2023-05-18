@@ -38,8 +38,8 @@ int main()
     // glfw: initialize and configure
     // ------------------------------
     glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 #ifdef __APPLE__
@@ -71,15 +71,12 @@ int main()
         return -1;
     }
 
+    const GLubyte* glslVersion = glGetString(GL_SHADING_LANGUAGE_VERSION);
+    std::cout << "GLSL Version is: " << glslVersion << std::endl;
+
     // configure global opengl state
     // -----------------------------
     glEnable(GL_DEPTH_TEST);
-
-
-    // build and compile shaders
-    // -------------------------
-    Shader shader("../Shaders/4_6_refractionCubeMap.vs.glsl", "../Shaders/4_6_refractionCubeMap.fs.glsl");
-    Shader skyboxShader("../Shaders/4_6_skybox.vs.glsl", "../Shaders/4_6_skybox.fs.glsl");
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
@@ -208,8 +205,11 @@ int main()
       std::string("../resources/textures/skybox/back.jpg"),
     };
     unsigned int cubemapTexture = loadCubemap(faces);
+
     // shader configuration
     // --------------------
+    Shader shader("../Shaders/4_7_uniformBuffer.vs", "../Shaders/4_7_uniformBuffer.fs");
+    Shader skyboxShader("../Shaders/4_6_skybox.vs.glsl", "../Shaders/4_6_skybox.fs.glsl");
     shader.use();
     shader.setInt("skybox ", 0);
     
@@ -218,6 +218,14 @@ int main()
 
     // draw as wireframe
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+    // configure a uniform buffer
+    unsigned int uboMatrices;
+    glGenBuffers(1, &uboMatrices);
+    glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
+    glBufferData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), NULL, GL_STATIC_DRAW);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0); 
+    glBindBufferRange(GL_UNIFORM_BUFFER, 0, uboMatrices, 0, 2 * sizeof(glm::mat4));
 
     // render loop
     // -----------
@@ -240,20 +248,40 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // draw scene as normal
-        shader.use();
-        glm::mat4 model = glm::mat4(1.0f);
         glm::mat4 view = camera.GetViewMatrix();
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
+        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(projection));
+        glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(view));
+        glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+        shader.use();
+        // cube 1
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(-0.75f, 0.75f, 0.0f));
         shader.setMat4("model", model);
-        shader.setMat4("view", view);
-        shader.setMat4("projection", projection);
-        shader.setVec3("cameraPos", camera.Position);
-        // cubes 
         glBindVertexArray(cubeVAO);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, cubeTexture); 	
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        // cube 2
+        model = glm::mat4(1.0);
+        model = glm::translate(model, glm::vec3(0.75f, 0.75f, 0.0f));
+        shader.setMat4("model", model);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        // cube 3
+        model = glm::mat4(1.0);
+        model = glm::translate(model, glm::vec3(-0.75f, -0.75f, 0.0f));
+        shader.setMat4("model", model);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        // cube 4
+        model = glm::mat4(1.0);
+        model = glm::translate(model, glm::vec3(0.75f, -0.75f, 0.0f));
+        shader.setMat4("model", model);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         glBindVertexArray(0);
+
 
         // draw skybox as last
         glDepthFunc(GL_LEQUAL); // change depth function so depth test passes when values are equal to depth buffer's content
@@ -281,6 +309,7 @@ int main()
     glDeleteVertexArrays(1, &skyboxVAO);
     glDeleteBuffers(1, &cubeVBO);
     glDeleteBuffers(1, &skyboxVBO);
+    glDeleteBuffers(1, &uboMatrices);
 
     glfwTerminate();
     return 0;

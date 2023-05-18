@@ -46,6 +46,8 @@ foreach(sample IN ITEMS
     4_6_Skybox
     4_6_EnvironmentMap
     4_6_EnvironmentMapRefract
+    4_7_AdvancedGLSL_UniformBuffer
+    4_7_AdvancedGLSL_PointSize
     )
   add_subdirectory(${sample}) 
 endforeach()

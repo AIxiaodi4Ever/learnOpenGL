@@ -213,6 +213,7 @@ int main()
     // --------------------
     shader.use();
     shader.setInt("skybox ", 0);
+    shader.setInt("innerTexture", 1);
     
     skyboxShader.use();
     skyboxShader.setInt("skybox", 0);
@@ -253,6 +254,8 @@ int main()
         glBindVertexArray(cubeVAO);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, cubeTexture); 	
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, cubeInnerTexture);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         glBindVertexArray(0);
 
