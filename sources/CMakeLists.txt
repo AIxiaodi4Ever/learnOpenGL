@@ -48,6 +48,8 @@ foreach(sample IN ITEMS
     4_6_EnvironmentMapRefract
     4_7_AdvancedGLSL_UniformBuffer
     4_7_AdvancedGLSL_PointSize
+    4_8_GeometryShaderDrawHouse
+    4_8_GeometryShaderExplodeObj
     )
   add_subdirectory(${sample}) 
 endforeach()
