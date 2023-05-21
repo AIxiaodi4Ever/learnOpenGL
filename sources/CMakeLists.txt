@@ -50,6 +50,7 @@ foreach(sample IN ITEMS
     4_7_AdvancedGLSL_PointSize
     4_8_GeometryShaderDrawHouse
     4_8_GeometryShaderExplodeObj
+    4_8_GeometryShaderDrawNormal
     )
   add_subdirectory(${sample}) 
 endforeach()
