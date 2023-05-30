@@ -241,6 +241,14 @@ int main()
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
+
+
+/**
+ * The function processes user input from the keyboard to control the camera's movement in a GLFW
+ * window.
+ * 
+ * @param window A pointer to the GLFW window that is being used for rendering and input handling.
+ */
 void processInput(GLFWwindow *window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
