@@ -239,10 +239,6 @@ int main()
     return 0;
 }
 
-// process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
-// ---------------------------------------------------------------------------------------------------------
-
-
 /**
  * The function processes user input from the keyboard to control the camera's movement in a GLFW
  * window.
@@ -309,8 +305,13 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
     camera.ProcessMouseScroll(static_cast<float>(yoffset));
 }
 
-// utility function for loading a 2D texture from file
-// ---------------------------------------------------
+/**
+ * This function loads an image file as a texture and returns the texture ID.
+ * 
+ * @param path A string representing the file path of the texture image to be loaded.
+ * 
+ * @return an unsigned integer, which is the ID of the loaded texture.
+ */
 unsigned int loadTexture(char const *path)
 {
     unsigned int textureID;
