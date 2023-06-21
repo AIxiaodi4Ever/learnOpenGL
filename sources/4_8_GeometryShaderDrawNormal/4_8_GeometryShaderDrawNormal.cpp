@@ -168,6 +168,7 @@ int main()
     glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
     glBufferData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), NULL, GL_STATIC_DRAW);
     glBindBuffer(GL_UNIFORM_BUFFER, 0); 
+    // bind Uniform buffer to binding point 0
     glBindBufferRange(GL_UNIFORM_BUFFER, 0, uboMatrices, 0, 2 * sizeof(glm::mat4));
 
     // render loop
@@ -210,7 +211,7 @@ int main()
         nanosuit.Draw(normalShader);
 
         // draw skybox as last
-        view = glm::mat4(glm::mat3(view));
+        view = glm::mat4(glm::mat3(view));  // ignore camera movement for skybox
         glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
         glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(view));
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
