@@ -42,6 +42,10 @@ public:
 		setupMesh();
 	}
 
+	const unsigned int getVAO() const {
+		return VAO; 
+	}
+
 	// render the mesh
 	void Draw(Shader& shader) {
 		unsigned int diffuseNr = 1;

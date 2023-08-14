@@ -51,6 +51,7 @@ foreach(sample IN ITEMS
     4_8_GeometryShaderDrawHouse
     4_8_GeometryShaderExplodeObj
     4_8_GeometryShaderDrawNormal
+    4_9_Instancing
     )
   add_subdirectory(${sample}) 
 endforeach()
