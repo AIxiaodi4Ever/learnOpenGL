@@ -18,6 +18,13 @@ message(STATUS "GLFW IS: ${GLFW}")
 message(STATUS "ASSIMP IS: ${ASSIMP}")
 message(STATUS "OPENGL_LIBRARY is: ${OPENGL_LIBRARY}")
 
+# Set compiler flags to ignore warnings
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_COMPILER_IS_GNUCXX)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
+elseif(MSVC)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /w")
+endif()
+
 # each step
 foreach(sample IN ITEMS
     1_1_DrawTriangle
@@ -52,6 +59,8 @@ foreach(sample IN ITEMS
     4_8_GeometryShaderExplodeObj
     4_8_GeometryShaderDrawNormal
     4_9_Instancing
+    4_10_MSAA
+    5_1_blinnPhong
     )
   add_subdirectory(${sample}) 
 endforeach()

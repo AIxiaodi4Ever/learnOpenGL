@@ -8,11 +8,14 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <mutex>
 
 class Shader {
 public:
 	// the program ID
 	unsigned int ID;
+
+	Shader() { ID = -1; }
 
 	// constructor reads and builds the shader
 	Shader(const char* vertexPath, const char* fragmentPath) {
