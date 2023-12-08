@@ -19,14 +19,15 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
-unsigned int loadTexture(const char *path);
+unsigned int loadTexture(const char *path, bool gammaCorrection);
 unsigned int loadCubemap(const vector<std::string>& faces);
+unsigned int loadCubemap(const vector<std::string>& faces, bool gammaCorrection);
 
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
-bool blinn = false;
-bool blinnKeyPressed = false;
+bool gammaEnabled = false;
+bool gammaKeyPressed = false;
 
 // camera
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
@@ -88,13 +89,15 @@ int main()
     // configure global opengl state
     // -----------------------------
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // shader configuration
     // --------------------
     std::mutex shaderMutex;
     Shader skyboxShader("../Shaders/4_8_skybox.vs.glsl", "../Shaders/4_8_skybox.fs.glsl");
 
-    Shader shader("../Shaders/5_1_blinnPhong.vs", "../Shaders/5_1_blinnPhong.fs");
+    Shader shader("../Shaders/5_2_gamma_correction.vs", "../Shaders/5_2_gamma_correction.fs");
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
@@ -163,13 +166,14 @@ int main()
 
     // load textures
     // -------------
-    unsigned int floorTexture = loadTexture("D:/00SelfStudy/00computerScience/00Graphics/01OpenGL/xffCmake/resources/textures/wood.png");
-    unsigned int cubemapTexture = loadCubemap(faces);
+    unsigned int floorTexture = loadTexture("D:/00SelfStudy/00computerScience/00Graphics/01OpenGL/xffCmake/resources/textures/wood.png", false);
+    unsigned int floorTextureGamma = loadTexture("D:/00SelfStudy/00computerScience/00Graphics/01OpenGL/xffCmake/resources/textures/wood.png", true);
+    unsigned int cubemapTexture = loadCubemap(faces, false);
 
     // shader configuration
     // --------------------
     shader.use();
-    shader.setInt("texture1", 0);
+    shader.setInt("floorTexture", 0);
     skyboxShader.use();
     skyboxShader.setInt("skybox", 0);
 
@@ -184,13 +188,25 @@ int main()
     
     // lighting info
     // -------------
-    glm::vec3 lightPos(0.0f, 0.0f, 0.0f);
+    glm::vec3 lightPositions[] = {
+        glm::vec3(-3.0f, 0.0f, 0.0f),
+        glm::vec3(-1.0f, 0.0f, 0.0f),
+        glm::vec3 (1.0f, 0.0f, 0.0f),
+        glm::vec3 (3.0f, 0.0f, 0.0f)
+    };
+    glm::vec3 lightColors[] = {
+        glm::vec3(0.25),
+        glm::vec3(0.50),
+        glm::vec3(0.75),
+        glm::vec3(1.00)
+    };
 
     // draw as wireframe
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     // render loop
     // -----------
+    bool lastGamma = gammaEnabled;
     while(!glfwWindowShouldClose(window))
     {
         // per-frame time logic
@@ -216,10 +232,19 @@ int main()
         shader.setMat4("projection", projection);
         shader.setMat4("view", camera.GetViewMatrix());
         shader.setVec3("viewPos", camera.Position);
-        shader.setVec3("lightPos", lightPos);
-        shader.setBool("blinn", blinn);
+        shader.setVec3Buffer("lightPositions", 4, &lightPositions[0][0]);
+        shader.setVec3Buffer("lightColors", 4, &lightColors[0][0]);
+        shader.setBool("gamma", gammaEnabled);
+        // texture
         glBindVertexArray(planeVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, gammaEnabled ? floorTextureGamma : floorTexture);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+
+        if (lastGamma != gammaEnabled) {
+            std::cout << (gammaEnabled ? "Gamma Enabled" : "Gamma Disabled") << std::endl;
+            lastGamma = gammaEnabled;
+        }
 
         // draw skybox as last
         glm::mat4 view = camera.GetViewMatrix();
@@ -254,6 +279,8 @@ int main()
     // ------------------------------------------------------------------------
     glDeleteVertexArrays(1, &skyboxVAO);
     glDeleteBuffers(1, &skyboxVBO);
+    glDeleteVertexArrays(1, &planeVAO);
+    glDeleteBuffers(1, &planeVBO);
     glDeleteFramebuffers(1, &framebuffer);
     glDeleteBuffers(1, &uboMatrices);
 
@@ -282,12 +309,12 @@ void processInput(GLFWwindow *window)
 	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
 		camera.ProcessKeyboard(Camera_Movement::UP, deltaTime);
     }
-    if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS && !blinnKeyPressed) {
-        blinn = !blinn;
-        blinnKeyPressed = true;
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && !gammaKeyPressed) {
+        gammaEnabled = !gammaEnabled;
+        gammaKeyPressed = true;
     }
-    if (glfwGetKey(window, GLFW_KEY_B) == GLFW_RELEASE) {
-        blinnKeyPressed = false;
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_RELEASE) {
+        gammaKeyPressed = false;
     }
 }
 
@@ -332,7 +359,7 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 
 // utility function for loading a 2D texture from file
 // ---------------------------------------------------
-unsigned int loadTexture(char const *path)
+unsigned int loadTexture(char const *path, bool gammaCorrection)
 {
     unsigned int textureID;
     glGenTextures(1, &textureID);
@@ -341,16 +368,21 @@ unsigned int loadTexture(char const *path)
     unsigned char *data = stbi_load(path, &width, &height, &nrComponents, 0);
     if (data)
     {
-        GLenum format;
+        GLenum internalFormat;
+        GLenum dataFormat;
         if (nrComponents == 1)
-            format = GL_RED;
-        else if (nrComponents == 3)
-            format = GL_RGB;
-        else if (nrComponents == 4)
-            format = GL_RGBA;
+            internalFormat = dataFormat = GL_RED;
+        else if (nrComponents == 3) {
+            internalFormat = gammaCorrection ? GL_SRGB : GL_RGB;
+            dataFormat = GL_RGB;
+        }
+        else if (nrComponents == 4) {
+            internalFormat = gammaCorrection ? GL_SRGB_ALPHA : GL_RGBA;
+            dataFormat = GL_RGBA;
+        }
 
         glBindTexture(GL_TEXTURE_2D, textureID);
-        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, dataFormat, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -380,26 +412,72 @@ unsigned int loadTexture(char const *path)
 // -Z (back)
 // -------------------------------------------------------
 unsigned int loadCubemap(const vector<std::string>& faces) {
-  unsigned int textureID;
-  glGenTextures(1, &textureID);
-  glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+    unsigned int textureID;
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
 
-  int width, height, channels;
-  for (unsigned int i = 0; i < faces.size(); ++i) {
-    unsigned char* data = stbi_load(faces[i].c_str(), &width, &height, &channels, 0);
-    if (data) {
-      glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-      stbi_image_free(data);
-    } else {
-      std::cout << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
-      stbi_image_free(data);
+    int width, height, nrComponents;
+    for (unsigned int i = 0; i < faces.size(); ++i) {
+        unsigned char* data = stbi_load(faces[i].c_str(), &width, &height, &nrComponents, 0);
+        if (data) {
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+            stbi_image_free(data);
+        } else {
+            std::cout << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
+            stbi_image_free(data);
+        }
     }
-  }
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-  return textureID;
+    return textureID;
+}
+
+// loads a cubemap texture from 6 individual texture faces
+// order:
+// +X (right)
+// -X (left)
+// +Y (top)
+// -Y (bottom)
+// +Z (front) 
+// -Z (back)
+// -------------------------------------------------------
+unsigned int loadCubemap(const vector<std::string>& faces, bool gammaCorrection) {
+    unsigned int textureID;
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+    int width, height, nrComponents;
+    for (unsigned int i = 0; i < faces.size(); ++i) {
+        unsigned char* data = stbi_load(faces[i].c_str(), &width, &height, &nrComponents, 0);
+        if (data) {
+        GLenum internalFormat;
+        GLenum dataFormat;
+        if (nrComponents == 1)
+            internalFormat = dataFormat = GL_RED;
+        else if (nrComponents == 3) {
+            internalFormat = gammaCorrection ? GL_SRGB : GL_RGB;
+            dataFormat = GL_RGB;
+        }
+        else if (nrComponents == 4) {
+            internalFormat = gammaCorrection ? GL_SRGB_ALPHA : GL_RGBA;
+            dataFormat = GL_RGBA;
+        }
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internalFormat, width, height, 0, dataFormat, GL_UNSIGNED_BYTE, data);
+        stbi_image_free(data);
+        } else {
+        std::cout << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
+        stbi_image_free(data);
+        }
+    }
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    return textureID;
 }

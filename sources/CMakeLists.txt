@@ -61,6 +61,7 @@ foreach(sample IN ITEMS
     4_9_Instancing
     4_10_MSAA
     5_1_blinnPhong
+    5_2_GammaCorrection
     )
   add_subdirectory(${sample}) 
 endforeach()
