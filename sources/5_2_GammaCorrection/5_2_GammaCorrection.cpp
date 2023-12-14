@@ -166,8 +166,8 @@ int main()
 
     // load textures
     // -------------
-    unsigned int floorTexture = loadTexture("D:/00SelfStudy/00computerScience/00Graphics/01OpenGL/xffCmake/resources/textures/wood.png", false);
-    unsigned int floorTextureGamma = loadTexture("D:/00SelfStudy/00computerScience/00Graphics/01OpenGL/xffCmake/resources/textures/wood.png", true);
+    unsigned int floorTexture = loadTexture("../resources/textures/wood.png", false);
+    unsigned int floorTextureGamma = loadTexture("../resources/textures/wood.png", true);
     unsigned int cubemapTexture = loadCubemap(faces, false);
 
     // shader configuration
