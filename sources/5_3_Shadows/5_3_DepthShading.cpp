@@ -246,6 +246,7 @@ int main()
         shader.use();
         glm::mat4 projection = camera.GetPerspective(SCR_WIDTH, SCR_HEIGHT, 0.1f, 100.0f);
         glm::mat4 view = camera.GetViewMatrix();
+        // glm::mat4 view = glm::lookAt(camera.Position, camera.Position + camera.Front, glm::vec3(0.0f, -1.0f, 0.0f));
         shader.setMat4("projection", projection);
         shader.setMat4("view", view);
         // set light uniform
