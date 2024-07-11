@@ -63,6 +63,7 @@ foreach(sample IN ITEMS
     5_1_blinnPhong
     5_2_GammaCorrection
     5_3_Shadows
+    5_4_NormalMap
     )
   add_subdirectory(${sample}) 
 endforeach()
