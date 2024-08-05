@@ -64,6 +64,7 @@ foreach(sample IN ITEMS
     5_2_GammaCorrection
     5_3_Shadows
     5_4_NormalMap
+    5_5_ParallaxMapping
     )
   add_subdirectory(${sample}) 
 endforeach()
