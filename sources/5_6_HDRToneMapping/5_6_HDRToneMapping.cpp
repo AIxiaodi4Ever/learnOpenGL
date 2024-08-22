@@ -546,7 +546,7 @@ void processInput(GLFWwindow *window)
         hdrKeyPressed = true;
         std::cout << "hdr: " << (hdr ? "on" : "off") << "| exposure: " << exposure << std::endl;
     }
-    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_RELEASE) {
         hdrKeyPressed = false;
         std::cout << "hdr: " << (hdr ? "on" : "off") << "| exposure: " << exposure << std::endl;
     }
