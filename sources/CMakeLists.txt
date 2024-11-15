@@ -68,6 +68,7 @@ foreach(sample IN ITEMS
     5_6_HDRToneMapping
     5_7_Bloom
     5_8_DeferredShading
+    5_9_SSAO
     )
   add_subdirectory(${sample}) 
 endforeach()
