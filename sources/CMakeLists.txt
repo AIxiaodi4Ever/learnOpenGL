@@ -70,6 +70,7 @@ foreach(sample IN ITEMS
     5_8_DeferredShading
     5_9_SSAO
     5_10_PBR
+    5_11_IBL
     )
   add_subdirectory(${sample}) 
 endforeach()
