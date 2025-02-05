@@ -37,6 +37,7 @@ void main()
             nrSamples++;
         }
     }
+    // PI / float(nrSamples) equals delta(theta) * delta(phi)
     irradiance = PI * irradiance * (1.0 / float(nrSamples));
     
     FragColor = vec4(irradiance, 1.0);
