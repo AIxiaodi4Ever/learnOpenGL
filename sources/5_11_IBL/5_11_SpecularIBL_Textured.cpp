@@ -84,7 +84,7 @@ int main()
 
     // build and compile shaders
     // -------------------------
-    Shader pbrShader("../Shaders/5_11_pbr_full.vs.glsl", "../Shaders/5_11_pbr_full.fs.glsl");
+    Shader pbrShader("../Shaders/5_11_pbr_full.vs.glsl", "../Shaders/5_11_pbr_full_textured.fs.glsl");
     Shader equirectangularToCubemapShader("../Shaders/5_11_cubemap.vs.glsl", "../Shaders/5_11_equirectangular_to_cubemap.fs.glsl");
     Shader irradianceShader("../Shaders/5_11_cubemap.vs.glsl", "../Shaders/5_11_irradiance_convolution.fs.glsl");
     Shader prefilterShader("../Shaders/5_11_cubemap.vs.glsl", "../Shaders/5_11_prefilter.fs.glsl");
@@ -96,13 +96,52 @@ int main()
     pbrShader.setInt("irradianceMap", 0);
     pbrShader.setInt("prefilterMap", 1);
     pbrShader.setInt("brdfLUT", 2);
-    pbrShader.setVec3("albedo", 0.5f, 0.0f, 0.0f);
-    pbrShader.setFloat("ao", 1.0f);
+    pbrShader.setInt("albedoMap", 3);
+    pbrShader.setInt("normalMap", 4);
+    pbrShader.setInt("metallicMap", 5);
+    pbrShader.setInt("roughnessMap", 6);
+    pbrShader.setInt("aoMap", 7);
 
     backgroundShader.use();
     backgroundShader.setInt("environmentMap", 0);
 
-  
+    // load PBR material textures
+    // --------------------------
+    // rusted iron
+    unsigned int ironAlbedoMap = loadTexture("../resources/textures/pbr/rusted_iron/albedo.png", false);
+    unsigned int ironNormalMap = loadTexture("../resources/textures/pbr/rusted_iron/normal.png", false);
+    unsigned int ironMetallicMap = loadTexture("../resources/textures/pbr/rusted_iron/metallic.png", false);
+    unsigned int ironRoughnessMap = loadTexture("../resources/textures/pbr/rusted_iron/roughness.png", false);
+    unsigned int ironAOMap = loadTexture("../resources/textures/pbr/rusted_iron/ao.png", false);
+
+    // gold
+    unsigned int goldAlbedoMap = loadTexture("../resources/textures/pbr/gold/albedo.png", false);
+    unsigned int goldNormalMap = loadTexture("../resources/textures/pbr/gold/normal.png", false);
+    unsigned int goldMetallicMap = loadTexture("../resources/textures/pbr/gold/metallic.png", false);
+    unsigned int goldRoughnessMap = loadTexture("../resources/textures/pbr/gold/roughness.png", false);
+    unsigned int goldAOMap = loadTexture("../resources/textures/pbr/gold/ao.png", false);
+
+    // grass
+    unsigned int grassAlbedoMap = loadTexture("../resources/textures/pbr/grass/albedo.png", false);
+    unsigned int grassNormalMap = loadTexture("../resources/textures/pbr/grass/normal.png", false);
+    unsigned int grassMetallicMap = loadTexture("../resources/textures/pbr/grass/metallic.png", false);
+    unsigned int grassRoughnessMap = loadTexture("../resources/textures/pbr/grass/roughness.png", false);
+    unsigned int grassAOMap = loadTexture("../resources/textures/pbr/grass/ao.png", false);
+
+    // plastic
+    unsigned int plasticAlbedoMap = loadTexture("../resources/textures/pbr/plastic/albedo.png", false);
+    unsigned int plasticNormalMap = loadTexture("../resources/textures/pbr/plastic/normal.png", false);
+    unsigned int plasticMetallicMap = loadTexture("../resources/textures/pbr/plastic/metallic.png", false);
+    unsigned int plasticRoughnessMap = loadTexture("../resources/textures/pbr/plastic/roughness.png", false);
+    unsigned int plasticAOMap = loadTexture("../resources/textures/pbr/plastic/ao.png", false);
+
+    // wall
+    unsigned int wallAlbedoMap = loadTexture("../resources/textures/pbr/wall/albedo.png", false);
+    unsigned int wallNormalMap = loadTexture("../resources/textures/pbr/wall/normal.png", false);
+    unsigned int wallMetallicMap = loadTexture("../resources/textures/pbr/wall/metallic.png", false);
+    unsigned int wallRoughnessMap = loadTexture("../resources/textures/pbr/wall/roughness.png", false);
+    unsigned int wallAOMap = loadTexture("../resources/textures/pbr/wall/ao.png", false);
+
     // lights
     // ------
     glm::vec3 lightPositions[] = {
@@ -117,9 +156,6 @@ int main()
         glm::vec3(300.0f, 300.0f, 300.0f),
         glm::vec3(300.0f, 300.0f, 300.0f)
     };
-    int nrRows = 7;
-    int nrColumns = 7;
-    float spacing = 2.5;
 
     // pbr: setup framebuffer
     // ----------------------
@@ -353,8 +389,10 @@ int main()
         // render scene, supplying the convoluted irradiance map to the final shader.
         // ------------------------------------------------------------------------------------------
         pbrShader.use();
+        glm::mat4 model = glm::mat4(1.0f);
         glm::mat4 view = camera.GetViewMatrix();
         glm::mat4 projection = camera.GetPerspective(SCR_WIDTH, SCR_HEIGHT, 0.1f, 100.0f);
+
         pbrShader.setMat4("view", view);
         pbrShader.setVec3("camPos", camera.Position);
         pbrShader.setMat4("projection", projection);
@@ -367,29 +405,90 @@ int main()
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, brdfLUTTexture);
 
-        // render rows*column number of spheres with varying metallic/roughness values scaled by rows and columns respectively
-        glm::mat4 model = glm::mat4(1.0f);
-        for (int row = 0; row < nrRows; ++row)
-        {
-            pbrShader.setFloat("metallic", (float)row / (float)nrRows);
-            for (int col = 0; col < nrColumns; ++col)
-            {
-                // we clamp the roughness to 0.025 - 1.0 as perfectly smooth surfaces (roughness of 0.0) tend to look a bit off
-                // on direct lighting.
-                pbrShader.setFloat("roughness", glm::clamp((float)col / (float)nrColumns, 0.05f, 1.0f));
+        // rusted iron
+        glActiveTexture(GL_TEXTURE3);
+        glBindTexture(GL_TEXTURE_2D, ironAlbedoMap);
+        glActiveTexture(GL_TEXTURE4);
+        glBindTexture(GL_TEXTURE_2D, ironNormalMap);
+        glActiveTexture(GL_TEXTURE5);
+        glBindTexture(GL_TEXTURE_2D, ironMetallicMap);
+        glActiveTexture(GL_TEXTURE6);
+        glBindTexture(GL_TEXTURE_2D, ironRoughnessMap);
+        glActiveTexture(GL_TEXTURE7);
+        glBindTexture(GL_TEXTURE_2D, ironAOMap);
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(-5.0, 0.0, 2.0));
+        pbrShader.setMat4("model", model);
+        pbrShader.setMat3("normalMatrix", glm::transpose(glm::inverse(glm::mat3(model))));
+        renderSphere();
 
-                model = glm::mat4(1.0f);
-                model = glm::translate(model, glm::vec3(
-                    (float)(col - (nrColumns / 2)) * spacing,
-                    (float)(row - (nrRows / 2)) * spacing,
-                    -2.0f
-                ));
-                pbrShader.setMat4("model", model);
-                pbrShader.setMat3("normalMatrix", glm::transpose(glm::inverse(glm::mat3(model))));
-                renderSphere();
-            }
-        }
+        // gold
+        glActiveTexture(GL_TEXTURE3);
+        glBindTexture(GL_TEXTURE_2D, goldAlbedoMap);
+        glActiveTexture(GL_TEXTURE4);
+        glBindTexture(GL_TEXTURE_2D, goldNormalMap);
+        glActiveTexture(GL_TEXTURE5);
+        glBindTexture(GL_TEXTURE_2D, goldMetallicMap);
+        glActiveTexture(GL_TEXTURE6);
+        glBindTexture(GL_TEXTURE_2D, goldRoughnessMap);
+        glActiveTexture(GL_TEXTURE7);
+        glBindTexture(GL_TEXTURE_2D, goldAOMap);
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(-3.0, 0.0, 2.0));
+        pbrShader.setMat4("model", model);
+        pbrShader.setMat3("normalMatrix", glm::transpose(glm::inverse(glm::mat3(model))));
+        renderSphere();
 
+        // grass
+        glActiveTexture(GL_TEXTURE3);
+        glBindTexture(GL_TEXTURE_2D, grassAlbedoMap);
+        glActiveTexture(GL_TEXTURE4);
+        glBindTexture(GL_TEXTURE_2D, grassNormalMap);
+        glActiveTexture(GL_TEXTURE5);
+        glBindTexture(GL_TEXTURE_2D, grassMetallicMap);
+        glActiveTexture(GL_TEXTURE6);
+        glBindTexture(GL_TEXTURE_2D, grassRoughnessMap);
+        glActiveTexture(GL_TEXTURE7);
+        glBindTexture(GL_TEXTURE_2D, grassAOMap);
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(-1.0, 0.0, 2.0));
+        pbrShader.setMat4("model", model);
+        pbrShader.setMat3("normalMatrix", glm::transpose(glm::inverse(glm::mat3(model))));
+        renderSphere();
+
+        // plastic
+        glActiveTexture(GL_TEXTURE3);
+        glBindTexture(GL_TEXTURE_2D, plasticAlbedoMap);
+        glActiveTexture(GL_TEXTURE4);
+        glBindTexture(GL_TEXTURE_2D, plasticNormalMap);
+        glActiveTexture(GL_TEXTURE5);
+        glBindTexture(GL_TEXTURE_2D, plasticMetallicMap);
+        glActiveTexture(GL_TEXTURE6);
+        glBindTexture(GL_TEXTURE_2D, plasticRoughnessMap);
+        glActiveTexture(GL_TEXTURE7);
+        glBindTexture(GL_TEXTURE_2D, plasticAOMap);
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(1.0, 0.0, 2.0));
+        pbrShader.setMat4("model", model);
+        pbrShader.setMat3("normalMatrix", glm::transpose(glm::inverse(glm::mat3(model))));
+        renderSphere();
+
+        // wall
+        glActiveTexture(GL_TEXTURE3);
+        glBindTexture(GL_TEXTURE_2D, wallAlbedoMap);
+        glActiveTexture(GL_TEXTURE4);
+        glBindTexture(GL_TEXTURE_2D, wallNormalMap);
+        glActiveTexture(GL_TEXTURE5);
+        glBindTexture(GL_TEXTURE_2D, wallMetallicMap);
+        glActiveTexture(GL_TEXTURE6);
+        glBindTexture(GL_TEXTURE_2D, wallRoughnessMap);
+        glActiveTexture(GL_TEXTURE7);
+        glBindTexture(GL_TEXTURE_2D, wallAOMap);
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(3.0, 0.0, 2.0));
+        pbrShader.setMat4("model", model);
+        pbrShader.setMat3("normalMatrix", glm::transpose(glm::inverse(glm::mat3(model))));
+        renderSphere();
 
         // render light source (simply re-render sphere at light positions)
         // this looks a bit off as we use the same shader, but it'll make their positions obvious and 
