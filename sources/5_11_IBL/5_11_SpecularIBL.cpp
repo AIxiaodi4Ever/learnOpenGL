@@ -89,7 +89,7 @@ int main()
     Shader irradianceShader("../Shaders/5_11_cubemap.vs.glsl", "../Shaders/5_11_irradiance_convolution.fs.glsl");
     Shader prefilterShader("../Shaders/5_11_cubemap.vs.glsl", "../Shaders/5_12_prefilter.fs.glsl");
     Shader brdfShader("../Shaders/5_12_brdf.vs.glsl", "../Shaders/5_12_brdf.fs.glsl");
-    Shader backgroundShader("../Shaders/5_12_background.vs.glsl", "../Shaders/5_12_background.fs.glsl");
+    Shader backgroundShader("../Shaders/5_11_background.vs.glsl", "../Shaders/5_11_background.fs.glsl");
 
 
     pbrShader.use();
@@ -257,7 +257,7 @@ int main()
     {
         for (unsigned int i = 0; i < 6; ++i)
         {
-            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, 128, 128, 0, GL_RGB, GL_FLOAT, nullptr);
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, 512, 512, 0, GL_RGB, GL_FLOAT, nullptr);
         }
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -276,12 +276,12 @@ int main()
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
     glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
-    unsigned int maxMipLevels = 5;
+    unsigned int maxMipLevels = 7;
     for (unsigned int mip = 0; mip < maxMipLevels; ++mip)
     {
         // reisze framebuffer according to mip-level size.
-        unsigned int mipWidth  = static_cast<unsigned int>(128 * std::pow(0.5, mip));
-        unsigned int mipHeight = static_cast<unsigned int>(128 * std::pow(0.5, mip));
+        unsigned int mipWidth  = static_cast<unsigned int>(512 * std::pow(0.5, mip));
+        unsigned int mipHeight = static_cast<unsigned int>(512 * std::pow(0.5, mip));
         glBindRenderbuffer(GL_RENDERBUFFER, captureRBO);
         glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, mipWidth, mipHeight);
         glViewport(0, 0, mipWidth, mipHeight);
@@ -416,15 +416,15 @@ int main()
         backgroundShader.setMat4("projection", projection);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
-        //glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap); // display irradiance map
-        //glBindTexture(GL_TEXTURE_CUBE_MAP, prefilterMap); // display prefilter map
+        // glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap); // display irradiance map
+        // glBindTexture(GL_TEXTURE_CUBE_MAP, prefilterMap); // display prefilter map
         renderCube();
         glDepthFunc(GL_LESS);  // set depth function back to default
 
 
         // render BRDF map to screen
-        //brdfShader.Use();
-        //renderQuad();
+        // brdfShader.use();
+        // renderQuad();
 
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
