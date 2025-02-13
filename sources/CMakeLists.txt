@@ -71,6 +71,7 @@ foreach(sample IN ITEMS
     5_9_SSAO
     5_10_PBR
     5_11_IBL
+    6_1_DebugOutput
     )
   add_subdirectory(${sample}) 
 endforeach()

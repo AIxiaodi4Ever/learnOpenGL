@@ -74,6 +74,17 @@ int main()
         return -1;
     }
 
+    // acquire all Driver and version informations
+    // ----------------------------------------------------------------
+    const GLubyte* glslVersion = glGetString(GL_SHADING_LANGUAGE_VERSION);
+    std::cout << "GLSL Version is: " << glslVersion << std::endl;
+    const GLubyte* glVersion = glGetString(GL_VERSION);
+    std::cout << "GL Version is: " << glVersion << std::endl;
+    const GLubyte* glVendor = glGetString(GL_VENDOR);
+    std::cout << "GL Vendor is: " << glVendor << std::endl;
+    const GLubyte* glRenderer = glGetString(GL_RENDERER);
+    std::cout << "GL Renderer is: " << glRenderer << std::endl;
+
     // configure global opengl state
     // -----------------------------
     glEnable(GL_DEPTH_TEST);

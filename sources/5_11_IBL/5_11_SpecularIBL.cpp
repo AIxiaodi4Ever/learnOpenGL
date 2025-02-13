@@ -20,6 +20,7 @@ unsigned int loadTexture(const char *path, bool gammaCorrection);
 void renderSphere();
 void renderCube();
 void renderQuad();
+void renderCornerQuad();
 
 // settings
 unsigned int SCR_WIDTH = 1280;
@@ -90,6 +91,7 @@ int main()
     Shader prefilterShader("../Shaders/5_11_cubemap.vs.glsl", "../Shaders/5_11_prefilter.fs.glsl");
     Shader brdfShader("../Shaders/5_11_brdf.vs.glsl", "../Shaders/5_11_brdf.fs.glsl");
     Shader backgroundShader("../Shaders/5_11_background.vs.glsl", "../Shaders/5_11_background.fs.glsl");
+    Shader frameBufferDebugShader("../Shaders/6_1_framebufferDebug.vs.glsl", "../Shaders/6_1_framebufferDebug.fs.glsl");
 
 
     pbrShader.use();
@@ -102,6 +104,8 @@ int main()
     backgroundShader.use();
     backgroundShader.setInt("environmentMap", 0);
 
+    frameBufferDebugShader.use();
+    frameBufferDebugShader.setInt("fboAttachment", 0);
   
     // lights
     // ------
@@ -390,14 +394,13 @@ int main()
             }
         }
 
-
         // render light source (simply re-render sphere at light positions)
         // this looks a bit off as we use the same shader, but it'll make their positions obvious and 
         // keeps the codeprint small.
         for (unsigned int i = 0; i < sizeof(lightPositions) / sizeof(lightPositions[0]); ++i)
         {
             glm::vec3 newPos = lightPositions[i] + glm::vec3(sin(glfwGetTime() * 5.0) * 5.0, 0.0, 0.0);
-            newPos = lightPositions[i];
+            // newPos = lightPositions[i];
             pbrShader.setVec3("lightPositions[" + std::to_string(i) + "]", newPos);
             pbrShader.setVec3("lightColors[" + std::to_string(i) + "]", lightColors[i]);
 
@@ -421,6 +424,10 @@ int main()
         renderCube();
         glDepthFunc(GL_LESS);  // set depth function back to default
 
+        frameBufferDebugShader.use();
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, brdfLUTTexture);
+        renderCornerQuad();
 
         // render BRDF map to screen
         // brdfShader.use();
@@ -699,6 +706,34 @@ void renderQuad()
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     }
     glBindVertexArray(quadVAO);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glBindVertexArray(0);
+}
+
+unsigned int cornerQuadVAO = 0;
+unsigned int cornerQuadVBO;
+void renderCornerQuad() {
+    if (cornerQuadVAO == 0)
+    {
+        float cornerQuadVertices[] = {
+            // positions        // texture Coords
+            0.55f, 0.95f, 0.0f, 1.0f,
+            0.55f, 0.55f, 0.0f, 0.0f,
+            0.95f, 0.95f, 1.0f, 1.0f,
+            0.95f, 0.55f, 1.0f, 0.0f,
+        };
+        // setup plane VAO
+        glGenVertexArrays(1, &cornerQuadVAO);
+        glGenBuffers(1, &cornerQuadVBO);
+        glBindVertexArray(cornerQuadVAO);
+        glBindBuffer(GL_ARRAY_BUFFER, cornerQuadVBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(cornerQuadVertices), &cornerQuadVertices, GL_STATIC_DRAW);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+    }
+    glBindVertexArray(cornerQuadVAO);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     glBindVertexArray(0);
 }
