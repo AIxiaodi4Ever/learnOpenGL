@@ -1,6 +1,6 @@
 # 2025-02-17
 ## fear
-- add textRendering demo in IBLSpecular
+- add textRendering demo
 - change textRendering encode method to utf16BE to support chinese character rendering(cause unicode in windows is implemented in utf16. utf8 is a more compressed version)
 ## bug fix
 - change all string and char to wstring and wchar in 6_2_TextRendering.cpp to support chinese character
