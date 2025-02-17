@@ -7,5 +7,6 @@ uniform sampler2D fboAttachment;
   
 void main()
 {
-    FragColor = texture(fboAttachment, TexCoords);
+    vec3 fboColor = texture(fboAttachment, TexCoords).rgb;
+    FragColor = vec4(fboColor, 1.0);
 }

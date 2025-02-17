@@ -228,7 +228,7 @@ int main()
     // set up projection matrix
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 10.0f);
     // bug2: bind uniform without use shader before
-    // shader.use();
+    shader.use();
     glUniformMatrix4fv(glGetUniformLocation(shader.ID, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
     glUniform1i(glGetUniformLocation(shader.ID, "tex"), 0);
 

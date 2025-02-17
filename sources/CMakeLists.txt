@@ -9,6 +9,9 @@ find_library(GLFW NAMES glfw3 PATHS ${PROJECT_SOURCE_DIR}/Libs)
 # assimp
 find_library(ASSIMP NAMES assimp-vc142-mt PATHS ${PROJECT_SOURCE_DIR}/Libs)
 
+# freetype
+find_library(FREETYPE NAMES freetype.lib PATHS ${PROJECT_SOURCE_DIR}/Libs)
+
 # OpenGL
 find_package(OpenGL REQUIRED OPTIONAL_COMPONENTS OpenGL)
 
@@ -72,6 +75,7 @@ foreach(sample IN ITEMS
     5_10_PBR
     5_11_IBL
     6_1_DebugOutput
+    6_2_TextRendering
     )
   add_subdirectory(${sample}) 
 endforeach()

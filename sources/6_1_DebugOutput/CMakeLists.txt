@@ -1,4 +1,4 @@
-# Diffuse IBL
+# DebugOutput
 add_executable(6_1_DebugOutput)
 target_sources(6_1_DebugOutput
   PRIVATE
