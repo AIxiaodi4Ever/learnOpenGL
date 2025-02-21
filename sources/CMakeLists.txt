@@ -76,6 +76,7 @@ foreach(sample IN ITEMS
     5_11_IBL
     6_1_DebugOutput
     6_2_TextRendering
+    6_3_BreakOut
     )
   add_subdirectory(${sample}) 
 endforeach()
