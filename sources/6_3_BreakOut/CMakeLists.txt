@@ -11,6 +11,7 @@ target_sources(6_3_BreakOut
   ./game_object.cpp
   ./game_level.cpp
   ./ball_object.cpp
+  ./particle_generator.cpp
 )
 target_link_directories(6_3_BreakOut PRIVATE ${PROJECT_SOURCE_DIR}/Libs)
 target_link_libraries(6_3_BreakOut
