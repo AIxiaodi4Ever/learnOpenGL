@@ -3,6 +3,7 @@
 - add 2D game demo
 - add particle effect for 2D game
 - add post process effect for 2D game
+- add power up for 2D game
 
 # 2025-02-17
 ## feat

@@ -15,6 +15,15 @@
 #include "game_object.h"
 #include "texture.h"
 
+enum Direction {
+	UP,
+	RIGHT,
+	DOWN,
+	LEFT
+};
+
+typedef std::tuple<bool, Direction, glm::vec2> Collision;
+
 // BallObject holds the state of the Ball object inheriting
 // relevant state data from GameObject. Contains some extra
 // functionality specific to Breakout's ball object that
@@ -25,6 +34,7 @@ public:
     // ball state	
     float   Radius;
     bool    Stuck;
+    bool    Sticky, PassThrough;
     // constructor(s)
     BallObject();
     BallObject(glm::vec2 pos, float radius, glm::vec2 velocity, Texture2D sprite);
