@@ -1,5 +1,11 @@
+# 2025-2-25
+## feat 
+- add 2D game demo
+- add particle effect for 2D game
+- add post process effect for 2D game
+
 # 2025-02-17
-## fear
+## feat
 - add textRendering demo
 - change 6_2_TextRendering.cpp encode method to utf16BE to support chinese character rendering(cause unicode in windows is implemented in utf16. utf8 is a more compressed version)
 ## bug fix
