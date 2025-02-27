@@ -1,16 +1,31 @@
 include_directories(${PROJECT_SOURCE_DIR}/includes)
+include_directories(${PROJECT_SOURCE_DIR}/includes/ffmpeg)
 
 # common source
 add_subdirectory(Common)
 
+# set project lib dir
+set(PROJECT_LIB_DIR ${PROJECT_SOURCE_DIR}/Libs)
 # GLFW
-find_library(GLFW NAMES glfw3 PATHS ${PROJECT_SOURCE_DIR}/Libs)
+find_library(GLFW NAMES glfw3 PATHS ${PROJECT_LIB_DIR} REQUIRED)
 
 # assimp
-find_library(ASSIMP NAMES assimp-vc142-mt PATHS ${PROJECT_SOURCE_DIR}/Libs)
+find_library(ASSIMP NAMES assimp-vc142-mt PATHS ${PROJECT_LIB_DIR} REQUIRED)
 
 # freetype
-find_library(FREETYPE NAMES freetype.lib PATHS ${PROJECT_SOURCE_DIR}/Libs)
+find_library(FREETYPE NAMES freetype.lib PATHS ${PROJECT_LIB_DIR} REQUIRED)
+
+# ffmpeg
+set(FFMPEG_ROOT "${PROJECT_LIB_DIR}/ffmpeg")
+set(FFMPEG_LIB_DIR "${FFMPEG_ROOT}/lib")
+find_library(AVCODEC_LIB avcodec PATHS ${FFMPEG_LIB_DIR} REQUIRED)
+find_library(AVFORMAT_LIB avformat PATHS ${FFMPEG_LIB_DIR} REQUIRED)
+find_library(AVDEVICE_LIB avdevice PATHS ${FFMPEG_LIB_DIR} REQUIRED)
+find_library(AVUTIL_LIB avutil PATHS ${FFMPEG_LIB_DIR} REQUIRED)
+find_library(SWRESAMPLE_LIB swresample PATHS ${FFMPEG_LIB_DIR} REQUIRED)
+find_library(SWSCALE_LIB swscale PATHS ${FFMPEG_LIB_DIR} REQUIRED)
+find_library(AVFILTER_LIB avfilter PATHS ${FFMPEG_LIB_DIR} REQUIRED)
+find_library(POSTPROC_LIB postproc PATHS ${FFMPEG_LIB_DIR} REQUIRED)
 
 # OpenGL
 find_package(OpenGL REQUIRED OPTIONAL_COMPONENTS OpenGL)
@@ -20,6 +35,14 @@ link_directories(${PROJECT_SOURCE_DIR}/Libs)
 message(STATUS "GLFW IS: ${GLFW}")
 message(STATUS "ASSIMP IS: ${ASSIMP}")
 message(STATUS "OPENGL_LIBRARY is: ${OPENGL_LIBRARY}")
+message(STATUS "AVCODEC_LIB is: ${AVCODEC_LIB}")
+message(STATUS "AVFORMAT_LIB is: ${AVFORMAT_LIB}")
+message(STATUS "AVDEVICE_LIB IS: ${AVDEVICE_LIB}")
+message(STATUS "AVUTIL_LIB is: ${AVUTIL_LIB}")
+message(STATUS "SWRESAMPLE_LIB is: ${SWRESAMPLE_LIB}")
+message(STATUS "SWSCALE_LIB is: ${SWSCALE_LIB}")
+message(STATUS "AVFILTER_LIB IS: ${AVFILTER_LIB}")
+message(STATUS "POSTPROC_LIB is: ${POSTPROC_LIB}")
 
 # Set compiler flags to ignore warnings
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_COMPILER_IS_GNUCXX)
@@ -30,6 +53,7 @@ endif()
 
 # each step
 foreach(sample IN ITEMS
+    0_0_TestFFmpeg
     1_1_DrawTriangle
     1_2_DrawRectangle
     1_3_DualVAOandVBOs

@@ -12,7 +12,7 @@ target_sources(STB_IMAGE
   stb_image.cpp
   )
 
-# model loader library
+# model loader library: for test how to use dll
 add_library(MODEL_LOADER)
 target_sources(MODEL_LOADER PRIVATE modelLoaderCommon.cpp)
 # copy assimp's dll

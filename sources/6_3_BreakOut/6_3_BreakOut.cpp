@@ -1,19 +1,18 @@
-
 /*******************************************************************
-** This code is part of Breakout.
-**
-** Breakout is free software: you can redistribute it and/or modify
-** it under the terms of the CC BY 4.0 license as published by
-** Creative Commons, either version 4 of the License, or (at your
-** option) any later version.
-******************************************************************/
+ ** This code is part of Breakout.
+ **
+ ** Breakout is free software: you can redistribute it and/or modify
+ ** it under the terms of the CC BY 4.0 license as published by
+ ** Creative Commons, either version 4 of the License, or (at your
+ ** option) any later version.
+ ******************************************************************/
+#include <iostream>
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 #include "game.h"
 #include "resource_manager.h"
-
-#include <iostream>
 
 // GLFW function declarations
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);

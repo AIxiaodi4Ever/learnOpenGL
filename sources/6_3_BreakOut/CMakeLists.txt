@@ -1,4 +1,4 @@
-# TextRendering
+# BreakOut
 add_executable(6_3_BreakOut)
 target_sources(6_3_BreakOut
   PRIVATE
@@ -14,7 +14,7 @@ target_sources(6_3_BreakOut
   ./particle_generator.cpp
   ./post_processor.cpp
 )
-target_link_directories(6_3_BreakOut PRIVATE ${PROJECT_SOURCE_DIR}/Libs)
+
 target_link_libraries(6_3_BreakOut
   PRIVATE
   ${GLFW}
