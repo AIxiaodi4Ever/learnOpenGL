@@ -1,3 +1,9 @@
+# 2025-02-28
+## feat
+- add FFMpeg lib and demo
+- add SDL2 and SDL2-mixer lib and demo
+- add irrKlang lib and demo
+
 # 2025-2-25
 ## feat 
 - add 2D game demo
