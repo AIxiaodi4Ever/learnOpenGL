@@ -10,6 +10,8 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <irrklang/irrKlang.h>
+using namespace irrklang;
 
 #include "game.h"
 #include "resource_manager.h"
@@ -25,8 +27,10 @@ const unsigned int SCREEN_HEIGHT = 600;
 
 Game Breakout(SCREEN_WIDTH, SCREEN_HEIGHT);
 
-int main(int argc, char *argv[])
+ISoundEngine *SoundEngine = createIrrKlangDevice();
+ int main(int argc, char *argv[])
 {
+    SoundEngine->play2D("../resources/audio/breakout.mp3", true);
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);

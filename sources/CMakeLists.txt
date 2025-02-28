@@ -16,8 +16,7 @@ find_library(ASSIMP NAMES assimp-vc142-mt PATHS ${PROJECT_LIB_DIR} REQUIRED)
 find_library(FREETYPE NAMES freetype.lib PATHS ${PROJECT_LIB_DIR} REQUIRED)
 
 # ffmpeg
-set(FFMPEG_ROOT "${PROJECT_LIB_DIR}/ffmpeg")
-set(FFMPEG_LIB_DIR "${FFMPEG_ROOT}/lib")
+set(FFMPEG_LIB_DIR "${PROJECT_LIB_DIR}/ffmpeg/lib")
 find_library(AVCODEC_LIB avcodec PATHS ${FFMPEG_LIB_DIR} REQUIRED)
 find_library(AVFORMAT_LIB avformat PATHS ${FFMPEG_LIB_DIR} REQUIRED)
 find_library(AVDEVICE_LIB avdevice PATHS ${FFMPEG_LIB_DIR} REQUIRED)
@@ -26,6 +25,16 @@ find_library(SWRESAMPLE_LIB swresample PATHS ${FFMPEG_LIB_DIR} REQUIRED)
 find_library(SWSCALE_LIB swscale PATHS ${FFMPEG_LIB_DIR} REQUIRED)
 find_library(AVFILTER_LIB avfilter PATHS ${FFMPEG_LIB_DIR} REQUIRED)
 find_library(POSTPROC_LIB postproc PATHS ${FFMPEG_LIB_DIR} REQUIRED)
+
+# SDL2
+set(SDL2_LIB_DIR "${PROJECT_LIB_DIR}/SDL2")
+find_library(SDL2 SDL2 PATHS ${SDL2_LIB_DIR} REQUIRED)
+find_library(SDL2MAIN SDL2main PATHS ${SDL2_LIB_DIR} REQUIRED)
+find_library(SDL2_MIXER SDL2_mixer PATHS ${SDL2_LIB_DIR} REQUIRED)
+
+# irrKlang
+set(IRRKLANG_LIB_DIR "${PROJECT_LIB_DIR}/irrKlang")
+find_library(IRRKLANG irrKlang PATHS ${IRRKLANG_LIB_DIR} REQUIRED)
 
 # OpenGL
 find_package(OpenGL REQUIRED OPTIONAL_COMPONENTS OpenGL)
@@ -43,6 +52,10 @@ message(STATUS "SWRESAMPLE_LIB is: ${SWRESAMPLE_LIB}")
 message(STATUS "SWSCALE_LIB is: ${SWSCALE_LIB}")
 message(STATUS "AVFILTER_LIB IS: ${AVFILTER_LIB}")
 message(STATUS "POSTPROC_LIB is: ${POSTPROC_LIB}")
+message(STATUS "SDL2 is: ${SDL2}")
+message(STATUS "SDL2_MIXER is: ${SDL2_MIXER}")
+message(STATUS "SDL2MAIN is: ${SDL2MAIN}")
+message(STATUS "IRRKLANG is: ${IRRKLANG}")
 
 # Set compiler flags to ignore warnings
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_COMPILER_IS_GNUCXX)
@@ -54,6 +67,7 @@ endif()
 # each step
 foreach(sample IN ITEMS
     0_0_TestFFmpeg
+    0_1_TestSDL2
     1_1_DrawTriangle
     1_2_DrawRectangle
     1_3_DualVAOandVBOs
