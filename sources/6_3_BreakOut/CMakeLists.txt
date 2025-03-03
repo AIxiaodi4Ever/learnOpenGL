@@ -13,6 +13,7 @@ target_sources(6_3_BreakOut
   ./ball_object.cpp
   ./particle_generator.cpp
   ./post_processor.cpp
+  ./text_renderer.cpp
 )
 
 target_link_libraries(6_3_BreakOut
@@ -24,6 +25,7 @@ target_link_libraries(6_3_BreakOut
   GLAD
   STB_IMAGE
   ${IRRKLANG}
+  ${FREETYPE}
 )
 
 # copy irrKlang dlls to build

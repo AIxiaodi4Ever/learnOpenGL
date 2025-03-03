@@ -1,3 +1,7 @@
+# 2025-03-03
+## feat
+- add text renderer to 2D game
+
 # 2025-02-28
 ## feat
 - add FFMpeg lib and demo

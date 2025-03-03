@@ -1,3 +1,4 @@
+// https://www.cnblogs.com/AnnihilateSword/articles/sdlstart_18stdMixerPlayMusicAndChunk.html
 #include <iostream>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_mixer.h>

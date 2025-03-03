@@ -22,6 +22,16 @@ enum GameState {
     GAME_WIN
 };
 
+// Represents the four possible (collision) directions
+enum Direction {
+	UP,
+	RIGHT,
+	DOWN,
+	LEFT
+};
+// Defines a Collision typedef that represents collision data
+typedef std::tuple<bool, Direction, glm::vec2> Collision; // <collision?, what direction?, difference vector center - closest point>
+
 // Initial size of the player paddle
 const glm::vec2 PLAYER_SIZE(100.0f, 20.0f);
 // Initial velocity of the player paddle
@@ -40,10 +50,12 @@ public:
     // game state
     GameState               State;	
     bool                    Keys[1024];
+    bool                    KeysProcessed[1024];
     unsigned int            Width, Height;
     std::vector<GameLevel>  Levels;
     unsigned int            Level;
     std::vector<PowerUp>    PowerUps;
+    unsigned int            Lives;
     // constructor/destructor
     Game(unsigned int width, unsigned int height);
     ~Game();
