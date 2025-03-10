@@ -1,3 +1,7 @@
+# 2025-03-10
+## feat
+- add WightedBlended OIT demo
+
 # 2025-03-03
 ## feat
 - add text renderer to 2D game
