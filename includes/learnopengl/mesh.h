@@ -13,10 +13,20 @@
 
 using namespace std;
 
+#define MAX_BONE_INFLUENCE 4
+
 struct Vertex {
 	glm::vec3 Position;
 	glm::vec3 Normal;
 	glm::vec2 TexCoords;
+    // tangent
+    glm::vec3 Tangent;
+    // bitangent
+    glm::vec3 Bitangent;
+	//bone indexes which will influence this vertex
+	int m_BoneIDs[MAX_BONE_INFLUENCE];
+	//weights from each bone
+	float m_Weights[MAX_BONE_INFLUENCE];
 };
 
 struct Texture {
@@ -50,6 +60,8 @@ public:
 	void Draw(Shader& shader) {
 		unsigned int diffuseNr = 1;
 		unsigned int specularNr = 1;
+		unsigned int normalNr   = 1;
+        unsigned int heightNr   = 1;
 		for (size_t i = 0; i < textures.size(); i++)
 		{
 			glActiveTexture(GL_TEXTURE0 + i); // activate texture unit first
@@ -59,8 +71,17 @@ public:
 			if (name == "texture_diffuse") {
 				number = to_string(diffuseNr++);
 			}
-			else if (name == "texture_specular") {
-				number = to_string(specularNr++);
+            else if(name == "texture_specular")
+			{
+                number = std::to_string(specularNr++); // transfer unsigned int to string
+			}
+            else if(name == "texture_normal")
+			{
+                number = std::to_string(normalNr++); // transfer unsigned int to string
+			}
+             else if(name == "texture_height")
+			{
+                number = std::to_string(heightNr++); // transfer unsigned int to string
 			}
 
 			shader.setInt(("material." + name + number).c_str(), i);
@@ -106,6 +127,18 @@ private:
 		// vertex texture coords
 		glEnableVertexAttribArray(2);
 		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoords));
+        // vertex tangent
+        glEnableVertexAttribArray(3);
+        glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Tangent));
+        // vertex bitangent
+        glEnableVertexAttribArray(4);
+        glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Bitangent));
+		// ids
+		glEnableVertexAttribArray(5);
+		glVertexAttribIPointer(5, 4, GL_INT, sizeof(Vertex), (void*)offsetof(Vertex, m_BoneIDs));
+		// weights
+		glEnableVertexAttribArray(6);
+		glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, m_Weights));
 
 		glBindVertexArray(0);
 	}

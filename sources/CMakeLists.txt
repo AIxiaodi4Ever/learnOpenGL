@@ -116,6 +116,7 @@ foreach(sample IN ITEMS
     6_2_TextRendering
     6_3_BreakOut
     7_1_WeightedBlendedOIT
+    7_2_SkeletalAnimation
     )
   add_subdirectory(${sample}) 
 endforeach()
